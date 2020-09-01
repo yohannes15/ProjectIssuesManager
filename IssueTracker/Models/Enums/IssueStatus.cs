@@ -1,7 +1,7 @@
 ﻿using System;
 namespace IssueTracker.Models.Enums
 {
-    public enum BugStatus
+    public enum IssueStatus
     {
         open,
         to_be_tested,

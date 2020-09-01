@@ -17,11 +17,11 @@ namespace IssueTracker.Models
         public string Description { get; set; }
         public DateTime CreatedTime { get; set; } //Dif
         public DateTime DueDate { get; set; }
-        public BugStatus BugStatus { get; set; }
+        public IssueStatus IssueStatus { get; set; }
         public string AssigneeUserId { get; set; }
         public string AssigneeUserName { get; set; }
         //public string UsersAssigned { get; set; } after authetnication
-        public BugPriority BugPriority { get; set; }
+        public IssuePriority IssuePriority { get; set; }
         public Reproducible Reproducible { get; set; }
         public List<ScreenShots> ScreenShots { get; set; }
         public List<Comment> Comments { get; set; }

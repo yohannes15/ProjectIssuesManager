@@ -60,7 +60,7 @@ namespace IssueTracker
                 config.Password.RequiredLength = 10;
                 config.Password.RequiredUniqueChars = 3;
                 config.Password.RequireNonAlphanumeric = true;
-                config.SignIn.RequireConfirmedAccount = true;
+                config.SignIn.RequireConfirmedAccount = false;
             }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
             services.AddAuthorization(options =>
@@ -97,6 +97,8 @@ namespace IssueTracker
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

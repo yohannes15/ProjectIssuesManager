@@ -1,7 +1,7 @@
 ﻿using System;
 namespace IssueTracker.Models.Enums
 {
-    public enum BugPriority
+    public enum IssuePriority
     {
         critical,
         major,
