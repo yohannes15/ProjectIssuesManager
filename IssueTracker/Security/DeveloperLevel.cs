@@ -28,7 +28,7 @@ namespace IssueTracker.Security
                 {
                     if (projectId.Length > 0)
                     {
-                        DeveloperProjects.Add(Convert.ToInt32(projectId);
+                        DeveloperProjects.Add(Convert.ToInt32(projectId));
                     }
                 }
 
@@ -57,7 +57,7 @@ namespace IssueTracker.Security
                 }
 
 
-                if (DeveloperProjects.Contains(GlobalVar.ProjectId))
+                if (DeveloperProjects.Contains(Global.ProjectId))
                 {
                     context.Succeed(requirement);
                 }

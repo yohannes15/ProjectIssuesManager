@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,7 +38,15 @@ namespace IssueTracker
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(config =>
+            {
+                var globalPolicy = new AuthorizationPolicyBuilder()
+                                       .RequireAuthenticatedUser()
+                                       .Build();
+
+                config.Filters.Add(new AuthorizeFilter(globalPolicy));
+                config.EnableEndpointRouting = false;
+            }).AddXmlSerializerFormatters();
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("ConnectionString")));
@@ -44,6 +54,14 @@ namespace IssueTracker
             services.AddScoped<IIssueRepository, SQLIssueRepository>();
             services.AddScoped<IProjectRepository, SQLProjectRepository>();
             services.AddScoped<IFirebaseStorage, FirebaseFileStorage>();
+
+            services.AddIdentity<IdentityUser, IdentityRole>(config =>
+            {
+                config.Password.RequiredLength = 10;
+                config.Password.RequiredUniqueChars = 3;
+                config.Password.RequireNonAlphanumeric = true;
+                config.SignIn.RequireConfirmedAccount = true;
+            }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
             services.AddAuthorization(options =>
             {

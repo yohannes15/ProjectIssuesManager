@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using IssueTracker.Models.CombModels;
 using IssueTracker.Storage;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace IssueTracker.Models
@@ -10,11 +12,18 @@ namespace IssueTracker.Models
     public class SQLProjectRepository : IProjectRepository
     {
         private readonly AppDbContext _context;
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<IdentityUser> userManager;
         private readonly IFirebaseStorage firebaseStorage;
 
-        public SQLProjectRepository(AppDbContext dbContext, IFirebaseStorage firebaseStorage)
+        public SQLProjectRepository(AppDbContext dbContext,
+            RoleManager<IdentityRole> roleManager,
+            UserManager<IdentityUser> userManager,
+            IFirebaseStorage firebaseStorage)
         {
             _context = dbContext;
+            this.roleManager = roleManager;
+            this.userManager = userManager;
             this.firebaseStorage = firebaseStorage;
         }
         public Project Add(Project project)
@@ -73,9 +82,41 @@ namespace IssueTracker.Models
 
         }
 
-        public List<Project> GetAllOwnedProjects(string userId)
+        public async Task<List<Project>> GetAllOwnedProjects(string userId)
         {
-            throw new NotImplementedException();
+            var user = await userManager.FindByIdAsync(userId);
+            var existingUserClaims = await userManager.GetClaimsAsync(user);
+
+            var userProjectsList = new List<Project>();
+            var userProjectIdList = new List<string>();
+
+            foreach (var claim in existingUserClaims)
+            {
+                var projectList = claim.Value.Split(" ");
+                foreach (var id in projectList)
+                {
+                    if (id == "")
+                    {
+                        continue;
+                    }
+
+                    if (userProjectIdList.Contains(id) == false)
+                    {
+                        userProjectIdList.Add(id);
+                        var intId = Convert.ToInt32(id);
+                        var project = _context.Projects.AsNoTracking().FirstOrDefault(p => p.ProjectId == intId);
+                        if (project != null)
+                        {
+                            // Some extra thing missing here
+                            userProjectsList.Add(project);
+                        }
+                        
+
+                    }
+                }
+            }
+
+            return userProjectsList;
         }
 
         public List<ProjectHistory> GetAllProjectHistories(int projectId)

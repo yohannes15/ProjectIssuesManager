@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using IssueTracker.Models.CombModels;
 
 namespace IssueTracker.Models
@@ -8,7 +9,7 @@ namespace IssueTracker.Models
     {
         Project Add(Project project);
         Project Delete(int id);
-        List<Project> GetAllOwnedProjects(string userId);
+        Task<List<Project>> GetAllOwnedProjects(string userId);
         Project GetProject(int id);
         Project Update(Project updatedProject);
         ProjectIssue AddProjectIssues(ProjectIssue issue);
