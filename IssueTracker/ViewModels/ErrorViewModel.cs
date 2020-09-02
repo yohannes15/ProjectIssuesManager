@@ -1,0 +1,11 @@
+﻿using System;
+
+namespace IssueTracker.ViewModels
+{
+    public class ErrorViewModel
+    {
+        public string RequestId { get; set; }
+
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    }
+}
