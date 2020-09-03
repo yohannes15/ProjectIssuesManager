@@ -25,7 +25,7 @@
             @foreach (var project in Model)
             {
                 <tr>
-                    <th><a href="@Url.Action("SetGlobalVar", "project", new { projectId = project.ProjectId })">@project.ProjectName</a></th>
+                    <th><a href="@Url.Action("SetGlobal", "project", new { projectId = project.ProjectId })">@project.ProjectName</a></th>
                     <td>@project.OwnerUserName</td>
                     <td>
                         @{

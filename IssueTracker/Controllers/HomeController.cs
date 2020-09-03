@@ -39,6 +39,14 @@ namespace IssueTracker.Controllers
             var currentUser = await userManager.FindByIdAsync(userId);
             var currentUserClaims = await userManager.GetClaimsAsync(currentUser);
 
+            foreach(var claim in currentUserClaims)
+            {
+                Console.WriteLine(claim.Issuer);
+                Console.WriteLine(claim.Type);
+                Console.WriteLine(claim.Value);
+                Console.WriteLine("----------");
+            }
+
             Global.globalCurrentUserClaims = currentUserClaims.ToList();
 
             var viewModel = new HomeViewModel

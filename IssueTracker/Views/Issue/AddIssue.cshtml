@@ -1,0 +1,142 @@
+﻿@model AddNewIssueViewModel
+@inject IAuthorizationService AuthorizationService
+
+@{
+
+    Layout = "~/Views/Shared/_Project.cshtml";
+    var managerLevel = (await AuthorizationService.AuthorizeAsync(User, "ManagerPolicy")).Succeeded;
+    ViewBag.Title = "Add New Bug";
+
+
+}
+
+
+
+<div class="container mt-3">
+    <form id="submitBugDetailsForm" action="@Url.Action("addissue", "issue")" enctype="multipart/form-data" method="post">
+        <div class="form-group row">
+            <label asp-for="@Model.NewIssue.Title" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+                <input asp-for="@Model.NewIssue.Title" class="form-control bg-dark text-info" placeholder="Name" />
+                <span asp-validation-for="@Model.NewIssue.Title" style="display:block" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="@Model.NewIssue.Description" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+                <textarea asp-for="@Model.NewIssue.Description" class="form-control bg-dark text-info" placeholder="Enter a description"></textarea>
+                <span asp-validation-for="@Model.NewIssue.Description" style="display:block" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="@Model.NewIssue.AssigneeUserId" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+
+                @if (managerLevel)
+                {
+                    <select asp-for="@Model.NewIssue.AssigneeUserId" class="form-control bg-dark text-info">
+                        <option value="">no one yet</option>
+                        @foreach (var user in Model.ProjectUsers)
+                        {
+                            <option value="@user.Id">@user.UserName</option>
+                        }
+
+                    </select>
+                }
+                else
+                {
+                    <select disabled asp-for="@Model.NewIssue.AssigneeUserId" class="form-control bg-dark text-info">
+                        <option value="">no one yet</option>
+                        @foreach (var user in Model.ProjectUsers)
+                        {
+                            <option value="@user.Id">@user.UserName</option>
+                        }
+
+                    </select>
+                }
+                <span asp-validation-for="@Model.NewIssue.AssigneeUserId" style="display:block" class="text-danger"></span>
+
+            </div>
+        </div>
+        <div class="form-group row ">
+            <label asp-for="@Model.NewIssue.DueDate" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-5 col-lg-3">
+                <input asp-for="@Model.NewIssue.DueDate" class="form-control bg-dark text-info" type="date" />
+                <span asp-validation-for="@Model.NewIssue.DueDate" style="display:block" class="text-danger"></span>
+
+            </div>
+        </div>
+
+        <div class="form-group row ">
+            <label asp-for="@Model.NewIssue.IssuePriority" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+                <select asp-for="@Model.NewIssue.IssuePriority" class="form-control" style="color: #3498DB; background: #303030" id="bugSeverity">
+                    <option value="0" style="background: #b81c04; color:black">Critical</option>
+                    <option value="1" style="background: #d67404; color:black">Major</option>
+                    <option value="2" style="background: #ffee00; color:black">Minor</option>
+                </select>
+                <span asp-validation-for="@Model.NewIssue.IssuePriority" style="display:block" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row form-group ">
+            <label asp-for="@Model.NewIssue.Reproducible" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+                <select asp-for="@Model.NewIssue.Reproducible" class="form-control bg-dark text-info" asp-items="Html.GetEnumSelectList<Reproducible>()">
+                    <option value="">Please select</option>
+                </select>
+                <span asp-validation-for="@Model.NewIssue.Reproducible" style="display:block" class="text-danger"></span>
+            </div>
+        </div>
+
+
+        <div class="form-group row ">
+            <label asp-for="@Model.NewIssue.IssueStatus" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+                <select asp-for="@Model.NewIssue.IssueStatus" class="form-control" style="color: #3498DB; background: #303030" id="bugStatus">
+                    <option value="0" style="background:#375a7f; color:black">Open</option>
+                    <option value="1" style="background:#3498DB; color:black">To Be Tested</option>
+                    <option value="2" style="background:#00bc8c; color:black">Closed</option>
+                </select>
+                <span asp-validation-for="@Model.NewIssue.IssueStatus" style="display:block" class="text-danger"></span>
+            </div>
+        </div>
+
+        <input hidden id="StoreInitialScreenShots" data-url="@Url.Action("StoreInitialScreenShots", "Issue")" />
+        <input hidden id="associatedProject" asp-for="@Model.NewIssue.AssociatedProject" />
+
+        <div class="form-group row ">
+            <label for="screenShotInput" class="col-sm-3 col-form-label"></label>
+            <div class="col-sm-9">
+                <div class="custom-file">
+                    <input type="file" accept="image/*" id="screenShotInput" multiple class="form-control custom-file-input bg-dark text-info" />
+                    <label class="fileUploadLabel custom-file-label bg-dark text-info">Choose Screenshots...</label>
+                    <div class="inputMessage"></div>
+                    <div class="preview">
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="btn btn-primary clearPictures col-12 col-sm-4">clear pictures</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-9">
+                <div id="addBugScreenShotsSubmit" class="btn btn-primary">Submit</div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="spinnerDiv">
+    <span class="spinner three"></span>
+</div>
+
+<div class="blurryBackground"></div>
+
+@section Scripts{
+    <script src="~/lib/blueimp-load-image/load-image.all.min.js"></script>
+    <script src="~/js/addIssue.js"></script>
+    <script src="~/js/uploadScreenShots.js"></script>
+}

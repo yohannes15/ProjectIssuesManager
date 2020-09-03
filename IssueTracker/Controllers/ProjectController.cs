@@ -70,6 +70,8 @@ namespace IssueTracker.Controllers
                 _projectRepository.Add(newProject);
 
                 var claims = await userManager.GetClaimsAsync(currentUser);
+
+                Console.WriteLine(claims.Count);
                 var result = await userManager.RemoveClaimsAsync(currentUser, claims);
 
                 var claimList = new List<Claim>();
@@ -85,6 +87,15 @@ namespace IssueTracker.Controllers
                         claimList.Add(new Claim(ClaimsPile.AllClaims[i].Type, newProject.ProjectId.ToString()));
                     }
                 }
+
+                foreach (var claim in claimList)
+                {
+                    Console.WriteLine(claim.Issuer);
+                    Console.WriteLine(claim.Type);
+                    Console.WriteLine(claim.Value);
+                    Console.WriteLine("----------");
+                }
+
 
                 Global.globalCurrentUserClaims = claimList;
 
@@ -208,5 +219,54 @@ namespace IssueTracker.Controllers
             return View(viewModel);
 
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ProjectIssues(int projectId)
+        {
+            Global.ProjectId = projectId;
+            var project = _projectRepository.GetProject(projectId);
+            Global.Project = project;
+
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            var UserIsAdminLevel = ClaimsLevel.IsAdmin(userClaims.ToList(), projectId);
+
+            if (UserIsAdminLevel == false)
+            {
+                RedirectToAction("AccessDenied", "Account");
+            }
+
+            var projectIssues = _issueRepository.GetAllProjectIssues(projectId);
+            var viewModel = new ProjectDetailsViewModel
+            {
+                ProjectIssues = projectIssues,
+                Project = project,
+                ProjectId = projectId
+            };
+
+            return View(viewModel);
+
+        }
+
+        [Authorize(Policy = "AdminPolicy")]
+        public async Task<IActionResult> DeleteProject(int projectId)
+        {
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            var project = _projectRepository.Delete(projectId);
+            return RedirectToAction("Index", "Home");
+        }
+
+
+
+
     }
 }

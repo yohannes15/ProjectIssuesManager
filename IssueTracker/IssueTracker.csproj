@@ -18,6 +18,9 @@
     <Folder Include="ViewModels\Projects\" />
     <Folder Include="Views\Project\" />
     <Folder Include="wwwroot\js\" />
+    <Folder Include="ViewModels\Issues\" />
+    <Folder Include="Views\Issue\" />
+    <Folder Include="wwwroot\temporaryFileStorage\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />
@@ -33,5 +36,6 @@
     <PackageReference Include="FirebaseAuthentication.net" Version="3.4.0" />
     <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.7" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.21.1" />
   </ItemGroup>
 </Project>
