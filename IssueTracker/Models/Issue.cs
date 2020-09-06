@@ -13,7 +13,9 @@ namespace IssueTracker.Models
         public int AssociatedProject { get; set; }
         public string SubmitterId { get; set; } //Dif
         public string SubmitterUserName { get; set; } //Dif
+        [Required]
         public string Title { get; set; }
+        [Required]
         public string Description { get; set; }
         public DateTime CreatedTime { get; set; } //Dif
         public DateTime DueDate { get; set; }
@@ -25,11 +27,6 @@ namespace IssueTracker.Models
         public Reproducible Reproducible { get; set; }
         public List<ScreenShots> ScreenShots { get; set; }
         public List<Comment> Comments { get; set; }
-
-
-
-
-
 
     }
 }

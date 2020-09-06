@@ -21,6 +21,8 @@
     <Folder Include="ViewModels\Issues\" />
     <Folder Include="Views\Issue\" />
     <Folder Include="wwwroot\temporaryFileStorage\" />
+    <Folder Include="ViewModels\Admin\" />
+    <Folder Include="Views\Admin\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />

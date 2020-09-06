@@ -37,6 +37,18 @@
     {
       "library": "blueimp-load-image@5.14.0",
       "destination": "wwwroot/lib/blueimp-load-image/"
+    },
+    {
+      "library": "signalr.js@2.4.1",
+      "destination": "wwwroot/lib/signalr.js/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "@microsoft/signalr@latest",
+      "destination": "wwwroot/lib/signalr",
+      "files": [
+        "dist/browser/signalr.min.js"
+      ]
     }
   ]
 }

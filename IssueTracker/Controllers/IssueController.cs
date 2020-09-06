@@ -47,7 +47,6 @@ namespace IssueTracker.Controllers
         }
 
         [HttpGet]
-
         public async Task<IActionResult> AddIssue(int projectId)
         { 
             Global.ProjectId = projectId;
@@ -84,11 +83,14 @@ namespace IssueTracker.Controllers
             {
                 projectUsers.AddRange(project.UsersAssigned.Split(" ").ToList());
             }
+            Console.WriteLine(projectUsers[0]);
+
 
             foreach (var uId in projectUsers)
             {
                 var user = await userManager.FindByIdAsync(uId);
-                if (user != null && users.Contains(user) == false)
+                Console.WriteLine($"user is {user}");
+                if (user != null && !users.Contains(user))
                 {
                     users.Add(user);
                 }
@@ -101,6 +103,12 @@ namespace IssueTracker.Controllers
                 NewIssue = initial
             };
 
+            foreach (var user in users)
+            {
+                Console.WriteLine("USEr EMAIL");
+                Console.WriteLine(user.Email);
+            }
+
             return View(viewModel);
         }
 
@@ -110,6 +118,7 @@ namespace IssueTracker.Controllers
         {
             if (ModelState.IsValid)
             {
+                Console.WriteLine("Testing");
                 var userId = userManager.GetUserId(User);
                 var currentUser = await userManager.FindByIdAsync(userId);
                 var userClaims = await userManager.GetClaimsAsync(currentUser);
@@ -123,6 +132,7 @@ namespace IssueTracker.Controllers
                     var assignedUser = await userManager.FindByIdAsync(model.NewIssue.AssigneeUserId);
                     model.NewIssue.AssigneeUserName = assignedUser.UserName;
                 }
+
 
                 model.NewIssue.SubmitterId = userManager.GetUserId(User);
                 model.NewIssue.SubmitterUserName = userManager.GetUserName(User);
@@ -144,26 +154,252 @@ namespace IssueTracker.Controllers
                 _projectRepository.AddProjectIssues(projectIssue);
                 Console.WriteLine("HERERERER");
 
-                //var fileNames = new List<ScreenShots>();
+                var fileNames = new List<ScreenShots>();
 
-                //if(Global.globalInitialScreenShots == true)
-                //{
-                //    fileNames = await UploadScreenShotsToStorage(issue.IssueId);
-                //}
+                if (Global.globalInitialScreenShots == true)
+                {
+                    Console.WriteLine("Globally");
+                    fileNames = await UploadScreenShotsToStorage(issue.IssueId);
+                }
 
-                //Global.InitialScreenShots = false;
-                //_issueRepository.AddScreenShots(fileNames);
+                Global.InitialScreenShots = false;
+                _issueRepository.AddScreenShots(fileNames);
+
+                Console.WriteLine(_issueRepository.ScreenShots(issue.IssueId));
+
+
+
                 return RedirectToAction("index", "home");
             }
             return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> IssueDetails(int issueId)
+        {
+            var issue = _issueRepository.GetIssue(issueId);
+            Global.ProjectId = issue.AssociatedProject;
+
+            var project = _projectRepository.GetProject(issue.AssociatedProject);
+            Global.Project = project;
+
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            var IsUserLevel = ClaimsLevel.IsUser(userClaims.ToList(), issue.AssociatedProject);
+
+            if (IsUserLevel == false)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            var screenshots = _issueRepository.ScreenShots(issueId);
+            var projectName = project.ProjectName;
+            var comments = _issueRepository.Comments(issueId);
+            var issueHistory = _issueRepository.GetIssueHistories(issueId);
+            issue.Comments = comments;
+
+            var users = new List<IdentityUser>();
+            var projectUsers = new List<string>();
+            projectUsers.Add(project.OwnerId);
+
+            if(project.UsersAssigned != null)
+            {
+                projectUsers.AddRange(project.UsersAssigned.Split(" ").ToList());
+            }
+
+            foreach(var uId in projectUsers)
+            {
+                var user = await userManager.FindByIdAsync(uId);
+                if (user != null && !users.Contains(user))
+                {
+                    users.Add(user);
+                }
+            }
+
+            var viewModel = new IssueDetailsViewModel
+            {
+                Issue = issue,
+                IssueHistories = issueHistory,
+                ProjectId = issue.AssociatedProject,
+                CurrentUserName = User.Identity.Name,
+                ProjectName = project.ProjectName,
+                ProjectUsers = users,
+                Source = screenshots,
+                Updated = 0
+            };
+
+            return View(viewModel);
+
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> IssueDetails(IssueDetailsViewModel model)
+        {
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            var IsManagerLevel = ClaimsLevel.IsManager(userClaims.ToList(), model.Issue.AssociatedProject);
+
+            if (IsManagerLevel && model.Issue.AssigneeUserId != null)
+            {
+                var assignedUser = await userManager.FindByIdAsync(model.Issue.AssigneeUserId);
+                model.Issue.AssigneeUserName = assignedUser.UserName;
+            }
+
+            var uniqueFileNames = new List<ScreenShots>();
+
+            if(Global.globalInitialScreenShots == true)
+            {
+                uniqueFileNames = await UploadScreenShotsToStorage(model.Issue.IssueId);
+            }
+
+            Global.InitialScreenShots = false;
+
+            var originalIssue = _issueRepository.GetIssue(model.Issue.IssueId);
+
+            if(model.Issue.Title == null)
+            {
+                model.Issue.Title = originalIssue.Title;
+            }
+
+            var IsDeveloperLevel = ClaimsLevel.IsDeveloper(userClaims.ToList(), model.Issue.AssociatedProject);
+
+            if (IsDeveloperLevel)
+            {
+                foreach(var property in originalIssue.GetType().GetProperties())
+                {
+                    if (property.Name == "AssigneeUserId")
+                    {
+                        continue;
+                    }
+
+                    var oldValue = "";
+                    var newValue = "";
+
+                    if (property.GetValue(model.Issue) != null)
+                    {
+                        newValue = property.GetValue(model.Issue).ToString();
+                    }
+
+                    if (property.GetValue(originalIssue) != null)
+                    {
+                        oldValue = property.GetValue(originalIssue).ToString();
+                    }
+
+                    if (newValue != oldValue)
+                    {
+                        var changes = new IssueHistory
+                        {
+                            AssociatedIssueId = originalIssue.IssueId,
+                            DateModified = DateTime.Now,
+                            NewValue = newValue,
+                            OldValue = oldValue,
+                            Property = property.Name
+                        };
+
+                        _issueRepository.AddIssueHistory(changes);
+                    }
+
+                }
+            }
+
+            var issue = new Issue();
+            if (IsDeveloperLevel)
+            {
+                model.Issue.ScreenShots = uniqueFileNames;
+                model.Issue.ScreenShots.AddRange(_issueRepository.ScreenShots(model.Issue.IssueId));
+                issue = _issueRepository.Update(model.Issue);
+            }
+            else
+            {
+                issue = originalIssue;
+                issue.ScreenShots = uniqueFileNames;
+                issue.ScreenShots.AddRange(_issueRepository.ScreenShots(model.Issue.IssueId));
+            }
+            Console.WriteLine(issue.IssueId);
+            var project = _projectRepository.GetProject(issue.AssociatedProject);
+            var projectName = project.ProjectName;
+            issue.Comments = _issueRepository.Comments(issue.IssueId);
+            var issueHistory = _issueRepository.GetIssueHistories(issue.IssueId);
+
+            var users = new List<IdentityUser>();
+            var projectUsers = new List<string>();
+            projectUsers.Add(project.OwnerId);
+
+            if (project.UsersAssigned != null)
+            {
+                projectUsers.AddRange(project.UsersAssigned.Split(" ").ToList());
+            }
+
+            foreach (var uId in projectUsers)
+            {
+                var user = await userManager.FindByIdAsync(uId);
+                if (user != null && !users.Contains(user))
+                {
+                    users.Add(user);
+                }
+            }
+
+            var viewModel = new IssueDetailsViewModel
+            {
+                Issue = issue,
+                IssueHistories = issueHistory,
+                Updated = 1,
+                ProjectId = issue.AssociatedProject,
+                Source = issue.ScreenShots,
+                ProjectUsers = users,
+                ProjectName = projectName
+            };
+
+            return View(viewModel);
+        }
+
+        [Authorize(Policy="ManagerPolicy")]
+        public async Task<IActionResult> DeleteIssue(int issueId)
+        {
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            var issue = _issueRepository.Delete(issueId);
+            return RedirectToAction("ProjectIssues", "Project", new { projectId = issue.AssociatedProject});
+        }
+
+        [HttpPost]
+        [Authorize(Policy="ManagerPolicy")]
+        public async Task<IActionResult> DeleteScreenshot(int screenShotId)
+        {
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            try
+            {
+                _issueRepository.DeleteScreenShots(screenShotId);
+                return Json(new { status = "success", message = "screenshot deleted" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { status = "error", message = ex.Message });
+            }
         }
 
         [HttpPost]
         [Authorize(Policy = "UserPolicy")]
         public async Task<IActionResult> StoreInitialScreenShots(List<IFormFile> Attachments)
         {
-
-
             var currentUserId = userManager.GetUserId(HttpContext.User);
             var user = await userManager.FindByIdAsync(currentUserId);
             var claims = await userManager.GetClaimsAsync(user);
@@ -172,8 +408,6 @@ namespace IssueTracker.Controllers
 
             var extensions = new List<string>() { ".tiff", ".pjp", ".pjpeg", ".jfif", ".tif",
             ".svg", ".bmp", ".png", ".jpeg", ".svgz", ".jpg", ".webp", ".ico", ".xbm", ".dib"};
-
-            //var maxFileSize = 3 * 1024 * 1024;
 
             string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "temporaryFileStorage");
 
@@ -201,35 +435,13 @@ namespace IssueTracker.Controllers
 
 
                     }
-                    //else if (file.Length > maxFileSize)
-                    //{
 
-                    //    var filePaths = Directory.GetFiles(uploadsFolder).ToList();
-
-                    //    if (filePaths.Count > 0)
-                    //    {
-                    //        foreach (var path in filePaths)
-                    //        {
-                    //            System.IO.File.Delete(path);
-                    //        }
-                    //    }
-
-                    //    return Json(new { status = "fileTooLarge", message = "Please upload a smaller file" });
-                    //}
                     else
                     {
                         var uniqueFileName = "";
                         uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                        //using (var stream = System.IO.File.Create(filePath))
-                        //{
-                        //    file.CopyTo(stream);
 
-                        //    stream.Position = 0;
-
-
-
-                        //}
 
                         using (var fileStream = file.OpenReadStream())
                         {
@@ -255,7 +467,7 @@ namespace IssueTracker.Controllers
 
         public async Task<List<ScreenShots>> UploadScreenShotsToStorage(int issueId)
         {
-
+            Console.WriteLine("SCcuess");
             var currentUserId = userManager.GetUserId(HttpContext.User);
             var user = await userManager.FindByIdAsync(currentUserId);
             var claims = await userManager.GetClaimsAsync(user);

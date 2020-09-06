@@ -85,7 +85,7 @@
 
                 @if ((await AuthorizationService.AuthorizeAsync(User, "DeveloperPolicy")).Succeeded)
                 {
-                    <a href="@Url.Action("ListUsers", "Administration", new { Model.ProjectId})" class="text-center list-group-item list-group-item-action bg-dark">
+                    <a href="@Url.Action("ListUsers", "Admin", new { Model.ProjectId})" class="text-center list-group-item list-group-item-action bg-dark">
                         <div class="d-flex justify-content-center"><i class="align-self-center fas fa-users"></i></div>
                         List Users
                     </a>

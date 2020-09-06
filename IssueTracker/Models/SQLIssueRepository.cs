@@ -31,10 +31,16 @@ namespace IssueTracker.Models
 
         public Issue Update(Issue issueChanges)
         {
-            var issue = _context.Issues.Attach(issueChanges);
-            issue.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+            var issue = _context.Issues.First(i => i.IssueId == issueChanges.IssueId);
+            _context.Entry(issue).CurrentValues.SetValues(issueChanges);
             _context.SaveChanges();
-            return issueChanges;
+            return issue;
+
+            //var issue = _context.Issues.Attach(issueChanges);
+            //issue.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            //_context.SaveChanges();
+            //return issueChanges;
         }
 
         public Issue Delete(int id)
