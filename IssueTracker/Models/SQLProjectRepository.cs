@@ -54,6 +54,12 @@ namespace IssueTracker.Models
 
             foreach (var issue in projectIssues)
             {
+                Console.WriteLine($"Issue Ids: {issue.IssueId}");
+            }
+
+            foreach (var issue in projectIssues)
+            {
+                Console.WriteLine($"Issue TO Be Deleted {issue.IssueId}");
                 if (issue != null)
                 {
                     var projectScreenshots = _context.ScreenShots.Where(s => s.AssociatedIssue == issue.IssueId);
@@ -66,6 +72,7 @@ namespace IssueTracker.Models
                     var issueToDelete = _context.Issues.Find(issue.Id);
                     _context.Issues.Remove(issueToDelete);
                     _context.ProjectIssues.Remove(issue);
+                    Console.WriteLine("Scuess");
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -382,9 +383,217 @@ namespace IssueTracker.Controllers
             }
 
 
+
+
             return View(viewModel);
 
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            var userId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(userId);
+            var userClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = userClaims.ToList();
+
+            var user = await userManager.FindByIdAsync(model.UserId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"User with id {userId} doesn't exist";
+                return View("NotFound");
+            }
+
+            else
+            {
+                user.Email = model.Email;
+                user.UserName = model.UserName;
+                var result = await userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListUsers", new { projectId = model.ProjectId });
+                }
+
+                foreach(var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageUserClaims(string userId, int projectId)
+        {
+            Global.ProjectId = projectId;
+            var project = _projectRepository.GetProject(projectId);
+            Global.Project = project;
+
+            var uId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(uId);
+            var uClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = uClaims.ToList();
+
+            var user = await userManager.FindByIdAsync(userId);
+
+            var IsManagerLevel = ClaimsLevel.IsManager(User.Claims.ToList(), projectId);
+
+            if (IsManagerLevel == false)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+            else if (userId == userManager.GetUserId(User) || userId == project.OwnerId)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"User with id {userId} doesn't exist";
+                return View("NotFound");
+            }
+
+            var existingUserClaims = await userManager.GetClaimsAsync(user);
+
+            //foreach(var claim in existingUserClaims)
+            //{
+            //    Console.WriteLine("------");
+            //    Console.WriteLine(claim.Type);
+            //    Console.WriteLine(claim.Value);
+            //}
+
+            var viewModel = new ClaimsViewModel
+            {
+                UserId = userId,
+                ProjectId = projectId
+            };
+
+
+            for (var i = 0; i<ClaimsPile.AllClaims.Count; i++)
+            {
+                UserClaim userClaim = new UserClaim
+                {
+                    ClaimType = ClaimsPile.AllClaims[i].Type
+                };
+
+                var projectList = new List<string>();
+
+                if (existingUserClaims.Count == 4)
+                {
+                    projectList = existingUserClaims[i].Value.Split(" ").ToList();
+                }
+
+                for (int j=0; j<projectList.Count; j++)
+                {
+                    if (projectList[j] == projectId.ToString())
+                    {
+                        userClaim.IsSelected = true;
+                        break;
+                    }
+                }
+                viewModel.Claims.Add(userClaim);
+            }
+
+            foreach (var claim in viewModel.Claims)
+            {
+                Console.WriteLine(claim.ClaimType);
+                Console.WriteLine(claim.IsSelected);
+            }
+
+            return View(viewModel);
+
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "ManagerPolicy")]
+        public async Task<IActionResult> ManageUserClaims(ClaimsViewModel model)
+        {
+            var uId = userManager.GetUserId(User);
+            var currentUser = await userManager.FindByIdAsync(uId);
+            var uClaims = await userManager.GetClaimsAsync(currentUser);
+
+            Global.globalCurrentUserClaims = uClaims.ToList();
+
+            var user = await userManager.FindByIdAsync(model.UserId);
+            var project = _projectRepository.GetProject(model.ProjectId);
+
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"User with id {model.UserId} doesn't exist";
+                return View("NotFound");
+            }
+
+            if (model.UserId == userManager.GetUserId(User) || model.UserId == project.OwnerId)
+            {
+                return RedirectToAction("AccessDenied", "Account");
+            }
+
+            var existingUserClaims = await userManager.GetClaimsAsync(user);
+            var currentClaims = existingUserClaims.ToList();
+            var result = await userManager.RemoveClaimsAsync(user, existingUserClaims);
+
+            if(result.Succeeded == false)
+            {
+                ModelState.AddModelError("", "Cannot remove user existing claims");
+                return View(model);
+            }
+
+            var claimsList = new List<Claim>();
+
+            for(var i=0; i<model.Claims.Count; i++)
+            {
+                var projectList = new List<string>();
+                var projectListString = "";
+
+                if (currentClaims.Count == 4)
+                {
+                    projectList = currentClaims[i].Value.Split(" ").ToList();
+                    var currentClaimContainsId = ClaimsHelper.ContainsId(model.ProjectId.ToString(), projectList);
+                    if (currentClaimContainsId && model.Claims[i].IsSelected)
+                    {
+                        projectListString = String.Join(" ", projectList.ToArray());
+                    }
+                    else if (!currentClaimContainsId && model.Claims[i].IsSelected)
+                    {
+                        projectList.Add(model.ProjectId.ToString());
+                        projectListString = String.Join(" ", projectList.ToArray());
+                    }
+                    else if (currentClaimContainsId && model.Claims[i].IsSelected == false)
+                    {
+                        var newListWithRemovedId = ClaimsHelper.RemoveProjectId(model.ProjectId.ToString(), projectList);
+                        projectListString = String.Join(" ", newListWithRemovedId.ToArray());
+                    }
+                    else if (!currentClaimContainsId && model.Claims[i].IsSelected == false)
+                    {
+                        projectListString = String.Join(" ", projectList.ToArray());
+                    }
+                }
+
+                claimsList.Add(new Claim (model.Claims[i].ClaimType, projectListString));
+
+            }
+
+            result = await userManager.AddClaimsAsync(user, claimsList);
+
+            if (result.Succeeded == false)
+            {
+                ModelState.AddModelError("", "Cannot add selected claims to user");
+                return View(model);
+            }
+
+            return RedirectToAction("EditUser", new { userId = model.UserId, projectId = model.ProjectId });
+
+
+        }
+
+
+
+
 
     }
 }

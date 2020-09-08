@@ -23,7 +23,7 @@
                         @foreach (var issue in issuesByDueDate)
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <div><a href="@Url.Action("bugdetails", "bug", new { bugId = issue.IssueId })" class="text-info mr-1">@issue.Title</a></div>
+                                <div><a href="@Url.Action("issuedetails", "issue", new { issueId = issue.IssueId })" class="text-info mr-1">@issue.Title</a></div>
                                 <div>
                                     @{
                                         var severityBackgroundColor = "";
@@ -100,7 +100,7 @@
                             <li class="list-group-item d-flex justify-content-between align-items-center">
 
                                 <div>
-                                    <a href="@Url.Action("SetGlobalVar", "project", new { projectId = project.ProjectId })" class="text-info mr-1">@project.ProjectName</a>
+                                    <a href="@Url.Action("SetGlobal", "project", new { projectId = project.ProjectId })" class="text-info mr-1">@project.ProjectName</a>
                                 </div>
                                 <div>
                                     @{

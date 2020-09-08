@@ -35,6 +35,10 @@ namespace IssueTracker.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = userManager.GetUserId(HttpContext.User);
+            if(userId == "c5a162e3-c263-4f5a-9496-36de525937f1")
+            {
+                return RedirectToAction("MyIssues", "Home");
+            }
             
             var currentUser = await userManager.FindByIdAsync(userId);
             var currentUserClaims = await userManager.GetClaimsAsync(currentUser);
@@ -115,7 +119,13 @@ namespace IssueTracker.Controllers
 
             }
 
-            return View(projectList);
+            var viewModel = new MyProjectsViewModel
+            {
+                ProjectList = projectList,
+                UserId = userId
+            };
+
+            return View(viewModel);
 
         }
 

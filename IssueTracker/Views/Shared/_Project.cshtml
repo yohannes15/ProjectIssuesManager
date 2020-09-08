@@ -19,9 +19,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-primary border-bottom box-shadow">
+        <nav class="navbar navbar-expand-sm navbar-dark navigation border-bottom box-shadow">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-spider"></i>Issue Tracker</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><i class="fas fa-bug"></i>Project Tracker</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls=".navbar-collapse"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -71,21 +71,21 @@
 
 
     <div class="d-flex" id="wrapper">
-        <div class="bg-dark" id="sidebar-wrapper">
+        <div class="sidebar" id="sidebar-wrapper">
             <div class="list-group list-group-flush">
                 <input hidden value="@Model.ProjectId" id="projectId" />
-                <a href="@Url.Action("projectdetails", "project",  new { Model.ProjectId })" class="text-center list-group-item list-group-item-action bg-dark">
+                <a href="@Url.Action("projectdetails", "project",  new { Model.ProjectId })" class="text-center list-group-item list-group-item-action sidebar">
                     <div class="d-flex justify-content-center"><i class="align-self-center fas fa-fw fa-tachometer-alt"></i></div>
                     Dashboard
                 </a>
-                <a href="@Url.Action("projectIssues", "project", new { Model.ProjectId })" class="text-center list-group-item list-group-item-action bg-dark">
+                <a href="@Url.Action("projectIssues", "project", new { Model.ProjectId })" class="text-center list-group-item list-group-item-action sidebar">
                     <div class="d-flex justify-content-center"><i class="align-self-center fas fa-bug"></i></div>
                     Bugs
                 </a>
 
                 @if ((await AuthorizationService.AuthorizeAsync(User, "DeveloperPolicy")).Succeeded)
                 {
-                    <a href="@Url.Action("ListUsers", "Admin", new { Model.ProjectId})" class="text-center list-group-item list-group-item-action bg-dark">
+                    <a href="@Url.Action("ListUsers", "Admin", new { Model.ProjectId})" class="text-center list-group-item list-group-item-action sidebar">
                         <div class="d-flex justify-content-center"><i class="align-self-center fas fa-users"></i></div>
                         List Users
                     </a>
@@ -102,7 +102,7 @@
         </div>
     </div>
 
-    <footer class="border-top bg-primary footer text-muted">
+    <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2019 - BugTrackerProject - <a asp-area="" asp-controller="Home" asp-action="Privacy"><span class="text-light">Privacy</span></a>
         </div>

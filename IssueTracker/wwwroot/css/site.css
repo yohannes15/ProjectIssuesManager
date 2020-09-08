@@ -12,10 +12,42 @@ a {
     color: #0366d6;
 }
 
+.bg-dark{
+    background-color: cadetblue;
+}
+
+.bright {
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    border-radius: 5px;
+    padding: 4px 12px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+    transition: 0.25s;
+    font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+    font-size: 24px;
+    background-color: tomato;
+    color: white;
+}
+
+.bright:hover {
+    box-shadow: 0px 5px 8px rgba(0, 0, 0, 0.18);
+    transform: translateY(-2px);
+    transition: 0.25s;
+    background-color: whitesmoke;
+    color: black;
+}
+
+.sidebar {
+    background-color: cadetblue;
+    opacity: 0.8;
+}
+
 .btn-primary {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: lightseagreen;
+    border-color: lightskyblue;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
@@ -66,6 +98,8 @@ body {
 }
 
 .footer {
+    background-color:black;
+    color:black;
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -81,6 +115,10 @@ body {
     overflow-x: hidden;
 }
 
+.navigations {
+    background-color:black;
+}
+
 #sidebar-wrapper {
     min-height: 100vh;
     margin-left: -8rem;
@@ -90,16 +128,16 @@ body {
     transition: margin .25s ease-out;
 }
 
-    #sidebar-wrapper .sidebar-heading {
-        padding: 0.875rem 1.25rem;
-        font-size: 1.2rem;
-    }
+#sidebar-wrapper .sidebar-heading {
+    padding: 0.875rem 1.25rem;
+    font-size: 1.2rem;
+}
 
-    #sidebar-wrapper .list-group {
-        width: 8rem;
-        position: sticky;
-        top: 0;
-    }
+#sidebar-wrapper .list-group {
+    width: 8rem;
+    position: sticky;
+    top: 0;
+}
 
 #page-content-wrapper {
     min-width: 100vw;
@@ -314,6 +352,7 @@ body {
 
 .demoButton {
     margin: 0 auto 0 auto;
+    margin-top:8px;
 }
 
 .spinnerDiv {

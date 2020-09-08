@@ -25,6 +25,10 @@ namespace IssueTracker.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var model = new LoginViewModel()
             {
                 ReturnUrl = returnUrl,
@@ -142,6 +146,21 @@ namespace IssueTracker.Controllers
             {
                 return Json($"Email {email} is already taken. Please select a different email");
             }
+        }
+
+        [AcceptVerbs("Get", "Post")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginDemoAccount(string userId)
+        {
+            Console.WriteLine(userId);
+            var user = await userManager.FindByIdAsync(userId);
+
+            await signInManager.SignInAsync(user, false, null);
+            var claims = await userManager.GetClaimsAsync(user);
+
+            Global.globalCurrentUserClaims = claims.ToList();
+
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]

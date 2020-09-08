@@ -135,7 +135,7 @@
 
             </div>
             <div class="form-group col-sm-8 bugHistory" id="style-7">
-                <h4>Bug History</h4>
+                <h4>Issue History</h4>
                 <table class="table table-hover table-borderless table-striped">
                     <thead>
                         <tr>
@@ -250,27 +250,7 @@
 
 
 
-    <label asp-for="@Model.Issue.Comments"></label>
-    <div id="comments">
-        @foreach (var comment in Model.Issue.Comments)
-        {
-            <span style="display:none; visibility:hidden"
-                  data-associatedBug="@comment.AssociatedIssueId"
-                  data-userId="@comment.UserId"
-                  data-createdDate="@comment.CreatedDate"
-                  data-commentId="@comment.Id"
-                  data-actionUrl="@Url.Action("deletecomment", "issuecomment", new { commentId = comment.Id })"
-                  class="downloadedComment">
-                @comment.CommentBody
-            </span>
-        }
-    </div>
-    <hr style="height:1px; border:none; color:rgb(52, 152, 219); background-color:rgb(52, 152, 219);">
-    <form id="commentForm" action="@Url.Action("uploadcomment", "issuecomment")" class="container">
-        <p>Add a comment</p>
-        <textarea id="summernote" class="d-none" style="visibility:hidden" name="editordata" placeholder="Enter a comment"></textarea>
-        <button id="sendButton" type="submit" class="btn btn-primary d-block ml-auto">Add Comment</button>
-    </form>
+ 
     @if (managerLevel)
     {
         <button type="button" id="deleteButton" class="btn btn-danger">Delete Bug</button>

@@ -27,7 +27,7 @@
             @foreach (var issue in issuesByDueDate)
             {
                 <tr>
-                    <th><a href="@Url.Action("bugdetails", "bug", new { bugId = issue.IssueId })">@issue.Title</a></th>
+                    <th><a href="@Url.Action("issuedetails", "issue", new { issueId = issue.IssueId })">@issue.Title</a></th>
                     <td>@issue.SubmitterUserName</td>
                     <td>
                         @issue.AssigneeUserName

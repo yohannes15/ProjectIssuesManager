@@ -1,13 +1,15 @@
-﻿@model List<Project>
+﻿@model MyProjectsViewModel
+@inject IAuthorizationService AuthorizationService
 @{
     ViewBag.Title = "My Projects";
 }
 
-<div>
-    <a class="btn btn-primary" href="@Url.Action("addproject", "project")">Add Project</a>
-</div>
-
-
+@if (Model.UserId != "c5a162e3-c263-4f5a-9496-36de525937f1")
+{
+    <div>
+        <a class="btn bright" href="@Url.Action("addproject", "project")">Add Project</a>
+    </div>
+}
 
 <div class="table-responsive-xl" id="style-7">
     <table class="table table-hover table-borderless table-striped">
@@ -22,7 +24,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var project in Model)
+            @foreach (var project in Model.ProjectList)
             {
                 <tr>
                     <th><a href="@Url.Action("SetGlobal", "project", new { projectId = project.ProjectId })">@project.ProjectName</a></th>
