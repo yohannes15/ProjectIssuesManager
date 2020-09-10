@@ -2,6 +2,8 @@
 
 An application for managing issues, bugs and roles for projects. Built using ASP.NET Core 3.1 MVC and PostgreSQL. 
 
+![](Images/projects.png)
+
 There are three different roles and responsibilites that a signed up user potentially can have.
 
 * Admin - Can see a list of all users, change user claims for all projects, create new projects, assign users to all projects, delete and manage details of projects and issues.
