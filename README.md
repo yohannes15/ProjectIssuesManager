@@ -1,4 +1,4 @@
-# ProjectIssuesManager
+# ProjectIssuesManager --> LIVE DEMO (rb.gy/slh1z2)
 
 An application for managing issues, bugs and roles for projects. Built using ASP.NET Core 3.1 MVC and PostgreSQL. 
 
