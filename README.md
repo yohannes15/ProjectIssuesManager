@@ -8,6 +8,8 @@ There are three different roles and responsibilites that a signed up user potent
 * Project Manager - Can see a list of all users, change user claims for one project, create new project, assign users to created projects and issues and bugs, delete and manage details of specific projects only.
 * Developer - can see list of issues and bugs assigned to developer, can see projects it is part of (without the ability to change details), create a new issue/delete its own issue. Doesn't have the ability to manage and change any issues except his/her own.
 
+Identity-Based Authentication and Policy-Based Claims Authorization to manage responsibilities.
+
 # PostgreSQL
 
 The data for the ASPNETUSERS, Identities and Claims are stored in PostgreSQL using GCP Google Cloud SQL instance. THe other tables are Project, Issue, ProjectIssues, IssueHistory, ProjectHistory, Screenshots. 
