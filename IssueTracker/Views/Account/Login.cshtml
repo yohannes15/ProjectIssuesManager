@@ -1,29 +1,30 @@
 ﻿@model LoginViewModel
 
 @{
+    Layout = "~/Views/Shared/_Frontpage.cshtml";
     ViewBag.Title = "User Login";
 }
 
 
 <div class="row">
     <div class="col-md-6">
-        <h1>Login</h1>
+        <h1 style="color:darkslategray">Please Log In</h1>
         <hr />
         <form method="post">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Email"></label>
+                <label style="color: slategray" asp-for="Email"></label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Password"></label>
+                <label style="color:slategray" asp-for="Password"></label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <div class="checkbox">
-                    <label asp-for="RememberMe">
+                    <label style="color:slategray" asp-for="RememberMe">
                         <input asp-for="RememberMe" />
                         @Html.DisplayNameFor(m => m.RememberMe)
                     </label>
@@ -36,7 +37,7 @@
         </form>
     </div>
     <div class="col-md-6">
-        <h1>Demo User Logins</h1>
+        <h1 style="color: darkslategray; text-align: center">Demo User Logins</h1>
         <div class="container">
             <div class="row" style="margin-bottom:20px">
                 <div class="col">

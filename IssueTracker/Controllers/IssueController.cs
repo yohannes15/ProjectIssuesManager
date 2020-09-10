@@ -133,7 +133,6 @@ namespace IssueTracker.Controllers
                     model.NewIssue.AssigneeUserName = assignedUser.UserName;
                 }
 
-
                 model.NewIssue.SubmitterId = userManager.GetUserId(User);
                 model.NewIssue.SubmitterUserName = userManager.GetUserName(User);
                 model.NewIssue.CreatedTime = DateTime.Now;
@@ -169,7 +168,7 @@ namespace IssueTracker.Controllers
 
 
 
-                return RedirectToAction("index", "home");
+                return RedirectToAction("projectissues", "Project", new { projectId = model.NewIssue.AssociatedProject});
             }
             return View();
         }
@@ -256,12 +255,14 @@ namespace IssueTracker.Controllers
 
             var uniqueFileNames = new List<ScreenShots>();
 
-            if(Global.globalInitialScreenShots == true)
+            if(Global.InitialScreenShots == true)
             {
                 uniqueFileNames = await UploadScreenShotsToStorage(model.Issue.IssueId);
             }
 
             Global.InitialScreenShots = false;
+            _issueRepository.AddScreenShots(uniqueFileNames);
+
 
             var originalIssue = _issueRepository.GetIssue(model.Issue.IssueId);
 
@@ -348,13 +349,16 @@ namespace IssueTracker.Controllers
                 }
             }
 
+            var screenshots = _issueRepository.ScreenShots(model.Issue.IssueId);
+
+
             var viewModel = new IssueDetailsViewModel
             {
                 Issue = issue,
                 IssueHistories = issueHistory,
                 Updated = 1,
                 ProjectId = issue.AssociatedProject,
-                Source = issue.ScreenShots,
+                Source = screenshots,
                 ProjectUsers = users,
                 ProjectName = projectName
             };
@@ -485,11 +489,22 @@ namespace IssueTracker.Controllers
                 {
 
                     var fileNameSplit = file.Split("\\");
+                    foreach(var element in fileNameSplit)
+                    {
+                        Console.WriteLine("--><---");
+                        Console.WriteLine(element);
+                        Console.WriteLine("--><---");
+                    }
                     var fileNameSplitLength = fileNameSplit.Length;
+                    Console.WriteLine(fileNameSplitLength);
 
-                    var placeholderFile = "JustHereToKeepTheFolderFromBeingDeleted.png";
+                    Console.WriteLine("############");
+                    Console.WriteLine(fileNameSplit[fileNameSplitLength - 1]);
+                    Console.WriteLine("############");
 
-                    if (fileNameSplit[fileNameSplitLength - 1] != placeholderFile)
+                    var placeholderFile = "ToStopDeletion.png";
+
+                    if (fileNameSplit[fileNameSplitLength - 1].ToLower().Contains(placeholderFile.ToLower()) == false)
                     {
                         using (FileStream stream = new FileStream(file, FileMode.Open, FileAccess.Read))
                         {

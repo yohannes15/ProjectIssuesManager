@@ -38,3 +38,6 @@ namespace IssueTracker.Models
 
 
 }
+//"ConnectionStrings": {
+//    "ConnectionString": "User ID = yohannes;Password=crimecity56;Server=localhost;Port=5432;Database=IssueTracker.Dev;Integrated Security=true; Pooling=true;"
+//  }

@@ -36,7 +36,7 @@
             Reported by UserId: @Model.Issue.SubmitterUserName on @Model.Issue.CreatedTime.ToShortDateString() &nbsp;&nbsp;&nbsp; Project: @Model.ProjectName
         </div>
         <div class="row">
-            <label asp-for="@Model.Issue.Description" class="col-sm-2 col-form-label" style="color:#3498DB"></label>
+            <label asp-for="@Model.Issue.Description" class="col-sm-2 col-form-label" style="color:whitesmoke"></label>
         </div>
         <div class="col-sm-12 row form-group">
             @if (developerLevel)
@@ -52,7 +52,7 @@
         </div>
         <div class="row">
             <div class="form-group col-sm-4">
-                <label asp-for="@Model.Issue.AssigneeUserId" class="col-form-label" style="color:#3498DB"></label>
+                <label asp-for="@Model.Issue.AssigneeUserId" class="col-form-label" style="color:whitesmoke"></label>
                 @if (managerLevel)
                 {
                     <select asp-for="@Model.Issue.AssigneeUserId" class="form-control bg-dark text-info">
@@ -82,22 +82,22 @@
 
                 @if (developerLevel)
                 {
-                    <label asp-for="@Model.Issue.DueDate" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.DueDate" class="col-form-label" style="color: whitesmoke"></label>
                     <input asp-for="@Model.Issue.DueDate" class="form-control bg-dark text-info" type="date" />
                     <span asp-validation-for="@Model.Issue.DueDate" class="text-danger"></span>
-                    <label asp-for="@Model.Issue.IssuePriority" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.IssuePriority" class="col-form-label" style="color: whitesmoke"></label>
                     <select asp-for="@Model.Issue.IssuePriority" class="form-control" style="color: black" id="bugSeverity">
                         <option value="0" style="background: #b81c04">Critical</option>
                         <option value="1" style="background: #d67404">Major</option>
                         <option value="2" style="background: #ffee00">Minor</option>
                     </select>
                     <span asp-validation-for="@Model.Issue.IssuePriority" class="text-danger"></span>
-                    <label asp-for="@Model.Issue.Reproducible" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.Reproducible" class="col-form-label" style="color: whitesmoke"></label>
                     <select asp-for="@Model.Issue.Reproducible" class="form-control bg-dark text-info" asp-items="Html.GetEnumSelectList<Reproducible>()">
                         <option value="">Please select</option>
                     </select>
                     <span asp-validation-for="@Model.Issue.Reproducible" class="text-danger"></span>
-                    <label asp-for="@Model.Issue.IssueStatus" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.IssueStatus" class="col-form-label" style="color: whitesmoke"></label>
                     <select asp-for="@Model.Issue.IssueStatus" class="form-control" style="color: black" id="bugStatus">
                         <option value="0" style="background:#375a7f">Open</option>
                         <option value="1" style="background:#3498DB">To Be Tested</option>
@@ -108,22 +108,22 @@
                 }
                 else
                 {
-                    <label asp-for="@Model.Issue.DueDate" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.DueDate" class="col-form-label" style="color: whitesmoke"></label>
                     <input disabled asp-for="@Model.Issue.DueDate" class="form-control bg-dark text-info" type="date" />
                     <span asp-validation-for="@Model.Issue.DueDate" class="text-danger"></span>
-                    <label asp-for="@Model.Issue.IssuePriority" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.IssuePriority" class="col-form-label" style="color: whitesmoke"></label>
                     <select disabled asp-for="@Model.Issue.IssuePriority" class="form-control" style="color: black" id="bugSeverity">
                         <option value="0" style="background: #b81c04">Critical</option>
                         <option value="1" style="background: #d67404">Major</option>
                         <option value="2" style="background: #ffee00">Minor</option>
                     </select>
                     <span asp-validation-for="@Model.Issue.IssuePriority" class="text-danger"></span>
-                    <label asp-for="@Model.Issue.Reproducible" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.Reproducible" class="col-form-label" style="color: whitesmoke"></label>
                     <select disabled asp-for="@Model.Issue.Reproducible" class="form-control bg-dark text-info" asp-items="Html.GetEnumSelectList<Reproducible>()">
                         <option value="">Please select</option>
                     </select>
                     <span asp-validation-for="@Model.Issue.Reproducible" class="text-danger"></span>
-                    <label asp-for="@Model.Issue.IssueStatus" class="col-form-label" style="color:#3498DB"></label>
+                    <label asp-for="@Model.Issue.IssueStatus" class="col-form-label" style="color: whitesmoke"></label>
                     <select disabled asp-for="@Model.Issue.IssueStatus" class="form-control" style="color: black" id="bugStatus">
                         <option value="0" style="background:#375a7f">Open</option>
                         <option value="1" style="background:#3498DB">To Be Tested</option>
@@ -269,6 +269,14 @@
 
 
 </div>
+
+@*<div>
+    @foreach(var src in Model.Source)
+    {
+        <p>@src.FileName</p>
+        <p>@src.AssociatedIssue</p>
+    }
+</div>*@
 
 <div class="spinnerDiv">
     <span class="spinner three"></span>

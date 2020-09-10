@@ -23,8 +23,11 @@
     <Folder Include="wwwroot\temporaryFileStorage\" />
     <Folder Include="ViewModels\Admin\" />
     <Folder Include="Views\Admin\" />
+    <Folder Include="bin\Debug\netcoreapp3.1\publish\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Google.Cloud.AspNetCore.DataProtection.Kms" Version="1.0.0-alpha03" />
+    <PackageReference Include="Google.Cloud.AspNetCore.DataProtection.Storage" Version="1.0.0-alpha03" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -39,5 +42,9 @@
     <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.7" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.21.1" />
+    <PackageReference Include="Google.Cloud.Kms.V1" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="bin\Debug\netcoreapp3.1\publish\app.yaml" />
   </ItemGroup>
 </Project>

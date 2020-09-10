@@ -4,7 +4,7 @@
     Layout = "~/Views/Shared/_Project.cshtml";
     var issuesByDueDate = Model.ProjectIssues.OrderBy(d => d.DueDate);
 
-    ViewBag.Title = "Project Bugs";
+    ViewBag.Title = "Project Issues";
 }
 
 
@@ -13,7 +13,7 @@
 <div class="container-fluid">
     <div class="row justify-content-between">
         <h5 class="m-3">@Model.Project.ProjectName Bug List</h5>
-        <a class="btn btn-primary m-2" href="@Url.Action("addissue", "issue", new { projectId = Model.Project.ProjectId})">Add bug</a>
+        <a class="btn btn-primary m-2" href="@Url.Action("addissue", "issue", new { projectId = Model.Project.ProjectId})">Add Issue</a>
     </div>
     <div class="row justify-content-end">
         <p class="badge-secondary p-2 badge m-2">Bugs Count: @issuesByDueDate.Count()</p>
@@ -24,11 +24,11 @@
     <table class="table table-hover table-borderless table-striped">
         <thead>
             <tr>
-                <th scope="col">Bug Name</th>
+                <th scope="col">Issue Name</th>
                 <th scope="col">Reporter</th>
                 <th scope="col">Assignee</th>
-                <th scope="col">Status</th>
-                <th scope="col">Severity</th>
+                <th scope="col">Issue Status</th>
+                <th scope="col">Issue Priority</th>
                 <th scope="col">Entered Date</th>
                 <th scope="col">Due Date</th>
             </tr>

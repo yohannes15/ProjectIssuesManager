@@ -91,23 +91,9 @@
                 userDiv.parentNode.removeChild(userDiv);
 
 
-
-                //now remove the user from the dom
-
-
             })
 
 
 
         })
     }
-
-
-
-
-
-
-
-
-    //function end
-});

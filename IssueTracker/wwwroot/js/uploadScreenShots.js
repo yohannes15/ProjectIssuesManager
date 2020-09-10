@@ -1,5 +1,4 @@
-﻿var imageTypeArr = ["tiff", "pjp", "pjpeg", "jfif", "tif",
-    "svg", "bmp", "png", "jpeg", "svgz", "jpg", "webp", "ico", "xbm", "dib"];
+﻿var imageTypeArr = ["svg", "png", "jpeg", "jpg"];
 
 function validFileType(file) {
     var fileType = file.type.split("/")[1];
@@ -58,10 +57,6 @@ let preview = document.querySelector(".preview");
 let inputMessage = document.querySelector(".inputMessage");
 var clearPictures = document.querySelector(".clearPictures");
 clearPictures.onclick = clearScreenShots;
-
-
-
-
 
 
 function processScreenShot(e) {

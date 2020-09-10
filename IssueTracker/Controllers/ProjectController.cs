@@ -103,7 +103,7 @@ namespace IssueTracker.Controllers
 
                 Global.ProjectId = newProject.ProjectId;
 
-                return RedirectToAction("ProjectDetails", newProject.ProjectId);
+                return RedirectToAction("ProjectDetails", new { projectId = newProject.ProjectId });
             }
 
             return View();

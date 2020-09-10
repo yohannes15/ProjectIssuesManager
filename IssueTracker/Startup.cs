@@ -15,6 +15,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Google.Cloud.AspNetCore.DataProtection.Kms;
+using Google.Cloud.AspNetCore.DataProtection.Storage;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace IssueTracker
 {
@@ -22,6 +27,7 @@ namespace IssueTracker
     {
         
         public IConfiguration Configuration { get; }
+        private IWebHostEnvironment CurrentEnvironment { get; set; }
 
         public Startup(IWebHostEnvironment env)
         {
@@ -32,6 +38,8 @@ namespace IssueTracker
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+            CurrentEnvironment = env;
+
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -82,13 +90,42 @@ namespace IssueTracker
 
             services.Configure<FirebaseSettings>(Configuration.GetSection("FirebaseStorage"));
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
             services.AddOptions();
+
+            services.AddDataProtection().
+                PersistKeysToGoogleCloudStorage(
+                    Configuration["DataProtection:Bucket"],
+                    Configuration["DataProtection:Object"])
+                .ProtectKeysWithGoogleKms(
+                Configuration["DataProtection:KmsKeyName"]);
+
 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseForwardedHeaders();
+            app.Use(async (context, next) =>
+            {
+                if (context.Request.IsHttps || context.Request.Headers["X-Forwarded-Proto"] == Uri.UriSchemeHttps)
+                {
+                    await next();
+                }
+                else
+                {
+                    string queryString = context.Request.QueryString.HasValue ? context.Request.QueryString.Value : string.Empty;
+                    var https = "https://" + context.Request.Host + context.Request.Path + queryString;
+                    context.Response.Redirect(https, true);
+                }
+            });
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

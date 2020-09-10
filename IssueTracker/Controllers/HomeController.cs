@@ -76,6 +76,7 @@ namespace IssueTracker.Controllers
 
             foreach (var issue in myIssues)
             {
+                Console.WriteLine(issue.IssueId);
                 var project = _projectRepository.GetProject(issue.AssociatedProject);
                 projects.Add(project);
             }
